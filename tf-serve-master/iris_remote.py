@@ -27,7 +27,7 @@ train_filename = 'whatIf.tfrecords'  # address to save the TFRecords file
 # open the TFRecords file
 #writer = tf.python_io.TFRecordWriter(train_filename)
 with tf.python_io.TFRecordWriter(train_filename) as writer:
-    writer.write(example.SerializeToString())
+    writer.write(examples.SerializeToString())
 #writer.write(examples.SerializeToString())
 #--------------x---------------------x----------------
 request = classification_pb2.ClassificationRequest()
