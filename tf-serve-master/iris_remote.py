@@ -10,32 +10,45 @@ from tensorflow_serving.apis import prediction_service_pb2
 from grpc.beta import implementations
 import common
 
+COLUMN_NAMES = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species']
+SPECIES = ['Setosa', 'Versicolor', 'Virginica']
+
 channel = implementations.insecure_channel('127.0.0.1', 9000)
 stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
 
 inputs = common.get_test_inputs()
+# print("Inputs are: ")
+# print(inputs)
 examples = []
 for index, row in inputs.iterrows():
     example = tf.train.Example()
     for col, value in row.iteritems():
         example.features.feature[col].float_list.value.append(value)
     examples.append(example)
+
+# Second set of Examples
+inputs2 = pd.read_csv('data/iris_training.csv', names=COLUMN_NAMES, header=0)
+examples2 = [tf.train.Example() for index, row in inputs2.iterrows()]
+print("Examples2: ")
+print(examples2)
+
+
 #---------------------x-------------------x----------------------
-print("watch out for examples length: ")
-print(len(examples))
+print("Examples length: " + str(len(examples)))
 train_filename = 'whatIf.tfrecords'  # address to save the TFRecords file
+
 # open the TFRecords file
 #writer = tf.python_io.TFRecordWriter(train_filename)
 with tf.python_io.TFRecordWriter(train_filename) as writer:
-    writer.write(examples.SerializeToString())
-#writer.write(examples.SerializeToString())
+    for example in examples:
+        writer.write(example.SerializeToString())
 #--------------x---------------------x----------------
+
 request = classification_pb2.ClassificationRequest()
 request.model_spec.name = 'default'
 request.input.example_list.examples.extend(examples)
 
-#print("\nwatch out for request: ")
-#print(request)
+# print("Examples length: " + str(request))
 
 response = stub.Classify(request, 10.0)
 

@@ -17,11 +17,13 @@ train_x, train_y = train, train.pop(y_name)
 test = pd.read_csv('data/iris_test.csv', names=COLUMN_NAMES, header=0)
 test_x, test_y = test, test.pop(y_name)
 
+
 # prepare input / eval fn
 def train_input_fn(features, labels, batch_size):
     dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
     dataset = dataset.shuffle(1000).repeat().batch(batch_size)
     return dataset
+
 
 def eval_input_fn(features, labels, batch_size):
     features = dict(features)
@@ -30,15 +32,7 @@ def eval_input_fn(features, labels, batch_size):
     dataset = dataset.batch(batch_size)
     return dataset
 
-# create classifier
 
-# feature columns
-# [
-#     _NumericColumn(key='SepalLength', shape=(1,), default_value=None, dtype=tf.float32, normalizer_fn=None),
-#     _NumericColumn(key='SepalWidth', shape=(1,), default_value=None, dtype=tf.float32, normalizer_fn=None),
-#     _NumericColumn(key='PetalLength', shape=(1,), default_value=None, dtype=tf.float32, normalizer_fn=None),
-#     _NumericColumn(key='PetalWidth', shape=(1,), default_value=None, dtype=tf.float32, normalizer_fn=None)
-# ]
 feature_columns = [tf.feature_column.numeric_column(key=key)
                    for key in train_x.keys()]
 
@@ -89,12 +83,12 @@ serving_input_receiver_fn = tf.estimator.export.build_parsing_serving_input_rece
 export_dir = classifier.export_savedmodel('export', serving_input_receiver_fn)
 print('Exported to {}'.format(export_dir))
 
-#Tensorboard addition:
-summary_hook = tf.train.SummarySaverHook(
-    5,
-    output_dir='/media/gu38/VariousDB/CS598_GameScience/tf-serve-master/iris',
-    summary_op=tf.summary.merge_all())
-
-if tf.gfile.Exists('./iris'):
-    tf.gfile.DeleteRecursively('./iris')
-summary_writer = tf.summary.FileWriter('./iris', tf.get_default_graph())
+# #Tensorboard addition:
+# summary_hook = tf.train.SummarySaverHook(
+#     5,
+#     output_dir='/media/gu38/VariousDB/CS598_GameScience/googlewhatif/tf-serve-master/iris',
+#     summary_op=tf.summary.merge_all())
+#
+# if tf.gfile.Exists('./iris'):
+#     tf.gfile.DeleteRecursively('./iris')
+# summary_writer = tf.summary.FileWriter('./iris', tf.get_default_graph())
